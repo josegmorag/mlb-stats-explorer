@@ -262,15 +262,19 @@ input:disabled {
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: rgba(255,255,255,0.05);
-  border: 2px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .player-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top; /* Ensures the face is visible */
+  object-position: center 15%; /* Enfoque en la cara/gorra */
+  transform: scale(1.15); /* Elimina espacios vacíos laterales de png con padding */
 }
 
 .player-card:hover {
