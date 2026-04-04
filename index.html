@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MLB Stats Explorer - Leyendas</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="background-overlay"></div>
+    
+    <div class="app-container">
+      <header class="hero">
+        <div class="logo-container">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" class="baseball-icon">
+            <circle cx="12" cy="12" r="10" stroke="#E12140" stroke-width="2"/>
+            <path d="M7 6C9 8.5 9 15.5 7 18" stroke="#E12140" stroke-width="2" stroke-linecap="round"/>
+            <path d="M17 6C15 8.5 15 15.5 17 18" stroke="#E12140" stroke-width="2" stroke-linecap="round"/>
+            <path d="M5.5 8.5H7.5" stroke="#E12140" stroke-width="1" stroke-linecap="round"/>
+            <path d="M5.5 15.5H7.5" stroke="#E12140" stroke-width="1" stroke-linecap="round"/>
+            <path d="M16.5 8.5H18.5" stroke="#E12140" stroke-width="1" stroke-linecap="round"/>
+            <path d="M16.5 15.5H18.5" stroke="#E12140" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+          <h1>MLB <span>Stats Explorer</span></h1>
+        </div>
+        <p>Explora a las leyendas históricas del béisbol con un solo clic</p>
+      </header>
+
+      <main class="content-grid">
+        <!-- Sidebar Controls -->
+        <aside class="controls-panel glass-panel">
+          <h2>Filtros Históricos</h2>
+          
+          <form id="stats-form">
+            <div class="form-group">
+              <label for="stat-category">Categoría</label>
+              <select id="stat-category">
+                <option value="hits">Hits Totales</option>
+                <option value="homeRuns">Home Runs</option>
+                <option value="runsBattedIn">Carreras Impulsadas (RBI)</option>
+                <option value="stolenBases">Bases Robadas</option>
+                <option value="strikeOuts">Ponches (Lanzadores)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="stat-threshold">Mínimo (Umbral)</label>
+              <input type="number" id="stat-threshold" value="3000" min="0">
+            </div>
+            
+            <button type="submit" class="btn-primary" id="btn-search">
+              <span>Buscar Leyendas</span>
+              <div class="loader-spinner" style="display: none;"></div>
+            </button>
+          </form>
+
+          <hr class="divider">
+          
+          <div class="quick-actions">
+            <h3>Atajos Rápidos</h3>
+            <button class="btn-secondary" id="btn-3000-500">Club 3000 Hits & 500 HRs</button>
+          </div>
+
+          <hr class="divider">
+          
+          <!-- Bonus Feature: Buscador Universal -->
+          <div class="player-search">
+            <h3>Búsqueda Universal</h3>
+            <p class="helper-text">Busca las estadísticas de cualquier jugador</p>
+            <form id="universal-search-form" style="display: flex; flex-direction: column; gap: 12px;">
+              <input type="text" id="universal-search-input" placeholder="Escribe un nombre ej. Aaron Judge..." required style="width: 100%; font-size: 1.05rem; padding: 0.9rem 1rem;">
+              <button type="submit" class="btn-primary" style="margin: 0;" aria-label="Buscar" id="btn-universal-search">
+                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                 <span>Buscar Jugador</span>
+              </button>
+            </form>
+          </div>
+        </aside>
+
+        <!-- Results Area -->
+        <section class="results-area">
+          <div class="results-header">
+            <h2 id="results-title">Esperando Búsqueda...</h2>
+            <span class="results-count" id="results-count">0 resultados</span>
+          </div>
+
+          <!-- Loading Skeleton / Empty State -->
+          <div id="loading-state" class="state-container" style="display: none;">
+            <div class="sk-chase">
+              <div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div>
+              <div class="sk-chase-dot"></div><div class="sk-chase-dot"></div><div class="sk-chase-dot"></div>
+            </div>
+            <p>Bateando hacia la API...</p>
+          </div>
+
+          <div id="results-grid" class="results-grid">
+            <div class="empty-state">
+              <p>📍 Selecciona un filtro y haz clic en "Buscar Leyendas" para comenzar.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
