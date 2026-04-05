@@ -27,15 +27,15 @@ const categoryLabels = {
   strikeOuts: "Ponches"
 };
 
-const countryFlags = {
-  "USA": "🇺🇸", "Puerto Rico": "🇵🇷", "Venezuela": "🇻🇪", 
-  "Dominican Republic": "🇩🇴", "D.R.": "🇩🇴", "Cuba": "🇨🇺", "Japan": "🇯🇵",
-  "Mexico": "🇲🇽", "Canada": "🇨🇦", "Colombia": "🇨🇴", 
-  "Panama": "🇵🇦", "Nicaragua": "🇳🇮", "South Korea": "🇰🇷",
-  "Taiwan": "🇹🇼", "Australia": "🇦🇺", "Curacao": "🇨🇼",
-  "Aruba": "🇦🇼", "Bahamas": "🇧🇸", "Germany": "🇩🇪",
-  "Brazil": "🇧🇷", "Honduras": "🇭🇳", "Netherlands": "🇳🇱",
-  "United Kingdom": "🇬🇧", "US": "🇺🇸", "Virgin Islands": "🇻🇮"
+const countryCodes = {
+  "USA": "us", "Puerto Rico": "pr", "Venezuela": "ve", 
+  "Dominican Republic": "do", "D.R.": "do", "Cuba": "cu", "Japan": "jp",
+  "Mexico": "mx", "Canada": "ca", "Colombia": "co", 
+  "Panama": "pa", "Nicaragua": "ni", "South Korea": "kr",
+  "Taiwan": "tw", "Australia": "au", "Curacao": "cw",
+  "Aruba": "aw", "Bahamas": "bs", "Germany": "de",
+  "Brazil": "br", "Honduras": "hn", "Netherlands": "nl",
+  "United Kingdom": "gb", "US": "us", "Virgin Islands": "vi"
 };
 
 // State functions
@@ -129,8 +129,17 @@ function renderDetailedCards(data) {
     // Bio string construction
     let bioStr = "";
     if (p.birthDate) bioStr += `${p.birthDate} <span class="separator">|</span> `;
-    const flag = countryFlags[p.country] || p.country || "";
-    if (flag) bioStr += `${flag} <span class="separator">|</span> `;
+    
+    // Check if we have an ISO country code to render an image flag
+    const code = countryCodes[p.country];
+    let flagHtml = "";
+    if (code) {
+       flagHtml = `<img src="https://flagcdn.com/24x18/${code}.png" alt="${p.country}" style="vertical-align: middle; border-radius: 2px;" title="${p.country}">`;
+    } else if (p.country) {
+       flagHtml = p.country;
+    }
+
+    if (flagHtml) bioStr += `${flagHtml} <span class="separator">|</span> `;
     if (p.position) bioStr += `${p.position}`;
     if (p.height && p.weight) bioStr += `<br/>${p.height}, ${p.weight} lbs`;
 
