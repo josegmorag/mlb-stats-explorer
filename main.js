@@ -29,7 +29,7 @@ const categoryLabels = {
 
 const countryCodes = {
   "USA": "us", "Puerto Rico": "pr", "Venezuela": "ve", 
-  "Dominican Republic": "do", "D.R.": "do", "Cuba": "cu", "Japan": "jp",
+  "Dominican Republic": "do", "D.R.": "do", "DOM": "do", "Cuba": "cu", "Japan": "jp",
   "Mexico": "mx", "Canada": "ca", "Colombia": "co", 
   "Panama": "pa", "Nicaragua": "ni", "South Korea": "kr",
   "Taiwan": "tw", "Australia": "au", "Curacao": "cw",
