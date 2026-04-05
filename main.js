@@ -96,6 +96,75 @@ function renderCards(data, categoryValLabel) {
   }
 }
 
+// Render detailed trading cards for specific player searches
+function renderDetailedCards(data) {
+  resultsGrid.innerHTML = "";
+  
+  if (data.length === 0) {
+    resultsGrid.innerHTML = `<div class="empty-state"><p>No se encontraron detalles.</p></div>`;
+    resultsCount.textContent = "0 resultados";
+    return;
+  }
+  
+  resultsCount.textContent = `${data.length} coincidencias`;
+
+  data.forEach((p, index) => {
+    const imgUrl = `https://img.mlbstatic.com/mlb-photos/image/upload/d_people:generic:headshot:67:current.png/w_213,q_auto:best/v1/people/${p.id}/headshot/67/current`;
+    
+    const card = document.createElement("div");
+    card.className = "detailed-card";
+    card.style.animationDelay = `${index * 0.05}s`;
+    
+    // Bio string construction
+    let bioStr = "";
+    if (p.age) bioStr += `${p.age} años <span class="separator">|</span> `;
+    if (p.position) bioStr += `${p.position}`;
+    if (p.height && p.weight) bioStr += `<br/>${p.height}, ${p.weight} lbs`;
+
+    // Stats Grid HTML
+    let statsHtml = `<div class="stats-grid-extended">`;
+    if (p.isPitcher && p.era) {
+       statsHtml += `
+         <div class="stat-box"><span class="stat-label">ERA</span><span class="stat-val">${p.era || '0.00'}</span></div>
+         <div class="stat-box"><span class="stat-label">WHIP</span><span class="stat-val">${p.whip || '0.00'}</span></div>
+         <div class="stat-box"><span class="stat-label">K</span><span class="stat-val">${p.so || '0'}</span></div>
+         <div class="stat-box"><span class="stat-label">W</span><span class="stat-val">${p.wins || '0'}</span></div>
+         <div class="stat-box"><span class="stat-label">SV</span><span class="stat-val">${p.saves || '0'}</span></div>
+         <div class="stat-box"><span class="stat-label">IP</span><span class="stat-val">${p.ip || '0'}</span></div>
+       `;
+    } else {
+       statsHtml += `
+         <div class="stat-box"><span class="stat-label">AVG</span><span class="stat-val">${p.avg || '.000'}</span></div>
+         <div class="stat-box"><span class="stat-label">OPS</span><span class="stat-val">${p.ops || '.000'}</span></div>
+         <div class="stat-box"><span class="stat-label">HR</span><span class="stat-val">${p.hr || '0'}</span></div>
+         <div class="stat-box"><span class="stat-label">H</span><span class="stat-val">${p.hits || '0'}</span></div>
+         <div class="stat-box"><span class="stat-label">RBI</span><span class="stat-val">${p.rbi || '0'}</span></div>
+         <div class="stat-box"><span class="stat-label">SB</span><span class="stat-val">${p.sb || '0'}</span></div>
+       `;
+    }
+    statsHtml += `</div>`;
+
+    card.innerHTML = `
+      <div class="detailed-photo">
+        <img src="${imgUrl}" alt="${p.name}" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\'><circle cx=\\'12\\' cy=\\'12\\' r=\\'10\\' fill=\\'none\\' stroke=\\'%23ccc\\' stroke-width=\\'2\\'/></svg>'" />
+      </div>
+      <div class="detailed-info">
+        <h3>${p.name}</h3>
+        <div class="detailed-bio">${bioStr}</div>
+        ${statsHtml}
+      </div>
+    `;
+    resultsGrid.appendChild(card);
+  });
+
+  if (window.innerWidth <= 900) {
+    setTimeout(() => {
+      document.querySelector('.results-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+}
+
+
 // Fetch single category with pagination and optimization
 async function fetchCategory(category, limit = 500, threshold = 0) {
   const statGroup = category === "strikeOuts" ? "pitching" : "hitting";
@@ -236,41 +305,56 @@ universalSearchForm.addEventListener("submit", async (e) => {
         const statsRes = await fetch(`https://statsapi.mlb.com/api/v1/people/${person.id}?hydrate=stats(group=[hitting,pitching],type=[career])`);
         const statsData = await statsRes.json();
         
-        let hits = 0;
-        let hr = 0;
-        let isPitcher = false;
-        let so = 0;
+        let hitting = {};
+        let pitching = {};
+        let fullPerson = person;
 
-        if(statsData.people && statsData.people[0].stats) {
-          const statsArray = statsData.people[0].stats;
-          statsArray.forEach(st => {
-             if(st.group && st.group.displayName === "hitting" && st.type && st.type.displayName === "career") {
-                const s = st.splits[0].stat;
-                hits = s.hits || 0;
-                hr = s.homeRuns || 0;
-             }
-             if(st.group && st.group.displayName === "pitching" && st.type && st.type.displayName === "career") {
-                const s = st.splits[0].stat;
-                so = s.strikeOuts || 0;
-                isPitcher = true;
-             }
-          });
+        if (statsData.people && statsData.people.length > 0) {
+           fullPerson = statsData.people[0];
+           if(fullPerson.stats) {
+              fullPerson.stats.forEach(st => {
+                 if(st.group && st.group.displayName === "hitting" && st.type && st.type.displayName === "career") {
+                    hitting = st.splits[0].stat;
+                 }
+                 if(st.group && st.group.displayName === "pitching" && st.type && st.type.displayName === "career") {
+                    pitching = st.splits[0].stat;
+                 }
+              });
+           }
         }
         
-        const primaryStatLabel = isPitcher && so > 0 ? `${so} Ponches | ${hits} Hits` : `${hits} Hits | ${hr} HR`;
+        const pos = fullPerson.primaryPosition ? fullPerson.primaryPosition.abbreviation : "??";
+        const isPitcher = pos === "P" || (pitching.strikeOuts > 0 && !hitting.homeRuns);
 
         return {
-          id: person.id,
-          name: person.fullName,
-          primaryStat: primaryStatLabel,
-          both: false
+          id: fullPerson.id,
+          name: fullPerson.fullName,
+          age: fullPerson.currentAge || "",
+          position: fullPerson.primaryPosition ? fullPerson.primaryPosition.name : "Jugador",
+          height: fullPerson.height || "",
+          weight: fullPerson.weight || "",
+          isPitcher: isPitcher,
+          
+          avg: hitting.avg,
+          ops: hitting.ops,
+          hr: hitting.homeRuns,
+          hits: hitting.hits,
+          rbi: hitting.rbi,
+          sb: hitting.stolenBases,
+          
+          era: pitching.era,
+          whip: pitching.whip,
+          so: pitching.strikeOuts,
+          wins: pitching.wins,
+          saves: pitching.saves,
+          ip: pitching.inningsPitched
         };
       } catch (err) {
         return {
           id: person.id,
           name: person.fullName,
-          primaryStat: "Datos no disponibles",
-          both: false
+          position: "Datos no disponibles",
+          isPitcher: false
         };
       }
     });
@@ -278,7 +362,7 @@ universalSearchForm.addEventListener("submit", async (e) => {
     const detailedResults = await Promise.all(promises);
     
     currentResults = detailedResults;
-    renderCards(detailedResults, "");
+    renderDetailedCards(detailedResults);
     
   } catch (error) {
     console.error(error);
