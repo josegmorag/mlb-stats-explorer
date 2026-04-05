@@ -27,6 +27,17 @@ const categoryLabels = {
   strikeOuts: "Ponches"
 };
 
+const countryFlags = {
+  "USA": "🇺🇸", "Puerto Rico": "🇵🇷", "Venezuela": "🇻🇪", 
+  "Dominican Republic": "🇩🇴", "D.R.": "🇩🇴", "Cuba": "🇨🇺", "Japan": "🇯🇵",
+  "Mexico": "🇲🇽", "Canada": "🇨🇦", "Colombia": "🇨🇴", 
+  "Panama": "🇵🇦", "Nicaragua": "🇳🇮", "South Korea": "🇰🇷",
+  "Taiwan": "🇹🇼", "Australia": "🇦🇺", "Curacao": "🇨🇼",
+  "Aruba": "🇦🇼", "Bahamas": "🇧🇸", "Germany": "🇩🇪",
+  "Brazil": "🇧🇷", "Honduras": "🇭🇳", "Netherlands": "🇳🇱",
+  "United Kingdom": "🇬🇧", "US": "🇺🇸", "Virgin Islands": "🇻🇮"
+};
+
 // State functions
 function setLoading(isLoading) {
   if (isLoading) {
@@ -117,7 +128,9 @@ function renderDetailedCards(data) {
     
     // Bio string construction
     let bioStr = "";
-    if (p.age) bioStr += `${p.age} años <span class="separator">|</span> `;
+    if (p.birthDate) bioStr += `${p.birthDate} <span class="separator">|</span> `;
+    const flag = countryFlags[p.country] || p.country || "";
+    if (flag) bioStr += `${flag} <span class="separator">|</span> `;
     if (p.position) bioStr += `${p.position}`;
     if (p.height && p.weight) bioStr += `<br/>${p.height}, ${p.weight} lbs`;
 
@@ -329,7 +342,8 @@ universalSearchForm.addEventListener("submit", async (e) => {
         return {
           id: fullPerson.id,
           name: fullPerson.fullName,
-          age: fullPerson.currentAge || "",
+          birthDate: fullPerson.birthDate || "",
+          country: fullPerson.birthCountry || "",
           position: fullPerson.primaryPosition ? fullPerson.primaryPosition.name : "Jugador",
           height: fullPerson.height || "",
           weight: fullPerson.weight || "",
